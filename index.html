@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V Network Token Trust - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --success-color: #4cc9f0;
+            --danger-color: #f72585;
+            --warning-color: #f8961e;
+            --info-color: #43aa8b;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .dashboard-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            margin-top: 30px;
+            margin-bottom: 30px;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            background: var(--secondary-color);
+            color: white;
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        
+        .sidebar .logo {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 15px 25px;
+            margin: 5px 10px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .main-content {
+            padding: 30px;
+        }
+        
+        .card-custom {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        
+        .card-custom:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-header-custom {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+            border-bottom: none;
+        }
+        
+        .card-body-custom {
+            padding: 25px;
+        }
+        
+        .icon-box {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-right: 15px;
+        }
+        
+        .btn-custom {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+        
+        .stats-box {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .stats-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .stats-label {
+            color: #6c757d;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .task-card {
+            border-left: 5px solid;
+            transition: all 0.3s;
+        }
+        
+        .task-card.facebook {
+            border-left-color: #1877f2;
+        }
+        
+        .task-card.twitter {
+            border-left-color: #1da1f2;
+        }
+        
+        .task-card.instagram {
+            border-left-color: #e4405f;
+        }
+        
+        .task-card.youtube {
+            border-left-color: #ff0000;
+        }
+        
+        .task-card.telegram {
+            border-left-color: #0088cc;
+        }
+        
+        .platform-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+        
+        .platform-icon.facebook-bg {
+            background: #1877f2;
+        }
+        
+        .platform-icon.twitter-bg {
+            background: #1da1f2;
+        }
+        
+        .platform-icon.instagram-bg {
+            background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);
+        }
+        
+        .platform-icon.youtube-bg {
+            background: #ff0000;
+        }
+        
+        .platform-icon.telegram-bg {
+            background: #0088cc;
+        }
+        
+        .progress-custom {
+            height: 10px;
+            border-radius: 5px;
+        }
+        
+        .badge-custom {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        
+        .modal-custom .modal-content {
+            border-radius: 20px;
+            border: none;
+        }
+        
+        .modal-custom .modal-header {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 20px 20px 0 0;
+            border: none;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                min-height: auto;
+            }
+            
+            .main-content {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row dashboard-container">
+            <!-- Sidebar -->
+            <div class="col-lg-3 col-xl-2 sidebar d-none d-lg-block">
+                <div class="logo">
+                    <h3><i class="fas fa-network-wired"></i> VNTT Network</h3>
+                    <p class="small">Token Trust Platform</p>
+                </div>
+                
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#dashboard">
+                            <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#register">
+                            <i class="fas fa-user-plus me-2"></i> Register ID
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#daily-claim">
+                            <i class="fas fa-calendar-check me-2"></i> Daily Claim
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#social-tasks">
+                            <i class="fas fa-tasks me-2"></i> Social Tasks
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#referral">
+                            <i class="fas fa-users me-2"></i> Referral System
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#withdraw">
+                            <i class="fas fa-wallet me-2"></i> Withdraw Tokens
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#stats">
+                            <i class="fas fa-chart-bar me-2"></i> Statistics
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="mt-auto p-3">
+                    <div class="card bg-dark text-white">
+                        <div class="card-body text-center">
+                            <small>Connected Wallet:</small>
+                            <p id="walletAddress" class="mb-0 text-truncate">Not Connected</p>
+                            <button id="connectWallet" class="btn btn-sm btn-light mt-2">Connect Wallet</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-lg-9 col-xl-10 main-content">
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="fw-bold text-dark">Dashboard</h2>
+                    <div class="d-flex">
+                        <div class="stats-box me-3">
+                            <div class="stats-value" id="totalEarned">0</div>
+                            <div class="stats-label">Total Earned</div>
+                        </div>
+                        <div class="stats-box">
+                            <div class="stats-value" id="lockedTokens">0</div>
+                            <div class="stats-label">Locked Tokens</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Registration Card -->
+                <div class="card card-custom" id="register-card">
+                    <div class="card-header-custom">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-box bg-warning">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div>
+                                <h4 class="mb-0">Register Your ID</h4>
+                                <p class="mb-0 opacity-75">Join VNTT Network with referral link</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body-custom">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label class="form-label">Referral Upline Address</label>
+                                    <input type="text" class="form-control" id="uplineAddress" 
+                                           placeholder="Enter upline wallet address" readonly>
+                                </div>
+                                <p class="text-muted small">
+                                    Registration is free. You need to pay activation fee only when activating your ID.
+                                </p>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-center justify-content-center">
+                                <button id="registerBtn" class="btn btn-custom btn-lg">
+                                    <i class="fas fa-user-check me-2"></i> Register Now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Activation Card -->
+                <div class="card card-custom" id="activate-card">
+                    <div class="card-header-custom">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-box bg-success">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div>
+                                <h4 class="mb-0">Activate Your ID</h4>
+                                <p class="mb-0 opacity-75">Pay activation fee to start earning</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body-custom">
+                        <div class="row align-items-center">
+                            <div class="col-md-3 text-center">
+                                <div class="display-6 fw-bold text-primary">0.30 BUSD</div>
+                                <small>Activation Fee</small>
+                            </div>
+                            <div class="col-md-5">
+                                <p class="mb-2">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Get 100 VNTT tokens immediately
+                                </p>
+                                <p class="mb-2">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Start daily claims
+                                </p>
+                                <p class="mb-0">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Access all social tasks
+                                </p>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <button id="activateBtn" class="btn btn-custom btn-lg" disabled>
+                                    <i class="fas fa-lock me-2"></i> Activate ID
+                                </button>
+                                <p class="small text-muted mt-2">Connect wallet to activate</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Daily Claim Card -->
+                <div class="card card-custom" id="daily-claim-card">
+                    <div class="card-header-custom">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-box bg-info">
+                                <i class="fas fa-calendar-day"></i>
+                            </div>
+                            <div>
+                                <h4 class="mb-0">Daily Claim</h4>
+                                <p class="mb-0 opacity-75">Claim 100 VNTT tokens daily</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body-custom">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="progress mb-3">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                         role="progressbar" style="width: 75%;" 
+                                         aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+                                        18 hours passed
+                                    </div>
+                                </div>
+                                <p class="mb-1">
+                                    <strong>Next Claim Available In:</strong>
+                                    <span id="nextClaimTime" class="text-primary">6 hours</span>
+                                </p>
+                                <p class="mb-0 text-muted">
+                                    You can claim once every 24 hours. Today's claim: <span id="todayClaims">0/1</span>
+                                </p>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-center justify-content-center">
+                                <button id="dailyClaimBtn" class="btn btn-custom btn-lg" disabled>
+                                    <i class="fas fa-gift me-2"></i> Claim Now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Social Tasks Cards -->
+                <h3 class="mt-5 mb-4">Social Media Tasks</h3>
+                <div class="row" id="social-tasks-container">
+                    <!-- Tasks will be loaded here dynamically -->
+                </div>
+                
+                <!-- Referral Card -->
+                <div class="card card-custom mt-4" id="referral-card">
+                    <div class="card-header-custom">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-box bg-danger">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div>
+                                <h4 class="mb-0">Referral System</h4>
+                                <p class="mb-0 opacity-75">Earn from 10 level referrals</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body-custom">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Your Referral Link</h5>
+                                <div class="input-group mb-3">
+                                    <input type="text" class="form-control" id="referralLink" readonly>
+                                    <button class="btn btn-outline-primary" onclick="copyReferralLink()">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="stats-box">
+                                            <div class="stats-value" id="directRefs">0</div>
+                                            <div class="stats-label">Direct Referrals</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="stats-box">
+                                            <div class="stats-value" id="refEarnings">0</div>
+                                            <div class="stats-label">Referral Earnings</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Referral Rewards</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Level</th>
+                                                <th>Reward</th>
+                                                <th>Earned</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="referralTable">
+                                            <!-- Filled by JS -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Withdrawal Card -->
+                <div class="card card-custom mt-4" id="withdraw-card">
+                    <div class="card-header-custom">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-box bg-primary">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <div>
+                                <h4 class="mb-0">Withdraw Tokens</h4>
+                                <p class="mb-0 opacity-75">Withdraw after 90 days lock period</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body-custom">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Available for Withdrawal</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="availableWithdraw" value="0" readonly>
+                                        <span class="input-group-text">VNTT</span>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Withdrawal Amount</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="withdrawAmount" value="0">
+                                        <span class="input-group-text">VNTT</span>
+                                    </div>
+                                    <small class="text-muted">Withdrawal Fee: 0.10 BUSD</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Payment Method for Fee</label>
+                                    <select class="form-select" id="feePayment">
+                                        <option value="vntt">Pay with VNTT Tokens</option>
+                                        <option value="busd">Pay with BUSD</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Lock Period Status</label>
+                                    <div class="progress progress-custom mb-2">
+                                        <div class="progress-bar bg-success" style="width: 65%;"></div>
+                                    </div>
+                                    <p class="small mb-0">
+                                        <span id="daysRemaining">59 days</span> remaining for unlock
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-center justify-content-center">
+                                <button id="withdrawBtn" class="btn btn-custom btn-lg w-100" disabled>
+                                    <i class="fas fa-paper-plane me-2"></i> Withdraw Now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Task Verification Modal -->
+    <div class="modal fade modal-custom" id="taskModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Task Verification</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="taskDetails">
+                        <!-- Task details will be loaded here -->
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Proof Link/Screenshot URL</label>
+                        <input type="text" class="form-control" id="proofInput" 
+                               placeholder="Paste your screenshot link or post URL">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Or Upload Screenshot</label>
+                        <input type="file" class="form-control" id="proofFile" accept="image/*">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-custom" id="submitProof">Submit Proof</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Connect Wallet Modal -->
+    <div class="modal fade modal-custom" id="walletModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Connect Wallet</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="mb-4">
+                        <img src="https://cdn-icons-png.flaticon.com/512/825/825517.png" width="80" alt="MetaMask">
+                        <h4 class="mt-3">MetaMask</h4>
+                        <p class="text-muted">Connect to your MetaMask wallet</p>
+                    </div>
+                    <button class="btn btn-custom btn-lg w-100 mb-3" onclick="connectMetaMask()">
+                        <i class="fab fa-metamask me-2"></i> Connect MetaMask
+                    </button>
+                    <p class="small text-muted">
+                        We'll request permission to view your wallet address for transactions
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.7.0/dist/web3.min.js"></script>
+    <script>
+        // Configuration
+        const CONFIG = {
+            contractAddress: "0x...", // Your contract address here
+            chainId: "56", // BSC Mainnet
+            rpcUrl: "https://bsc-dataseed.binance.org/",
+            activationFee: "0.30",
+            dailyReward: "100",
+            socialTasks: [
+                {
+                    id: "fb_like_1",
+                    platform: "facebook",
+                    type: "like",
+                    title: "Like Facebook Post",
+                    description: "Like our official Facebook post",
+                    reward: "50",
+                    icon: "fab fa-facebook",
+                    color: "#1877f2"
+                },
+                {
+                    id: "fb_share_1",
+                    platform: "facebook",
+                    type: "share",
+                    title: "Share Facebook Post",
+                    description: "Share our post on your timeline",
+                    reward: "75",
+                    icon: "fab fa-facebook",
+                    color: "#1877f2"
+                },
+                {
+                    id: "twitter_follow_1",
+                    platform: "twitter",
+                    type: "follow",
+                    title: "Follow on Twitter",
+                    description: "Follow our Twitter account",
+                    reward: "100",
+                    icon: "fab fa-twitter",
+                    color: "#1da1f2"
+                },
+                {
+                    id: "twitter_retweet_1",
+                    platform: "twitter",
+                    type: "share",
+                    title: "Retweet Post",
+                    description: "Retweet our latest tweet",
+                    reward: "75",
+                    icon: "fab fa-twitter",
+                    color: "#1da1f2"
+                },
+                {
+                    id: "insta_follow_1",
+                    platform: "instagram",
+                    type: "follow",
+                    title: "Follow Instagram",
+                    description: "Follow our Instagram page",
+                    reward: "100",
+                    icon: "fab fa-instagram",
+                    color: "#e4405f"
+                },
+                {
+                    id: "insta_like_1",
+                    platform: "instagram",
+                    type: "like",
+                    title: "Like Instagram Post",
+                    description: "Like our Instagram post",
+                    reward: "50",
+                    icon: "fab fa-instagram",
+                    color: "#e4405f"
+                },
+                {
+                    id: "yt_subscribe_1",
+                    platform: "youtube",
+                    type: "follow",
+                    title: "Subscribe YouTube",
+                    description: "Subscribe to our YouTube channel",
+                    reward: "100",
+                    icon: "fab fa-youtube",
+                    color: "#ff0000"
+                },
+                {
+                    id: "yt_like_1",
+                    platform: "youtube",
+                    type: "like",
+                    title: "Like YouTube Video",
+                    description: "Like our latest video",
+                    reward: "50",
+                    icon: "fab fa-youtube",
+                    color: "#ff0000"
+                },
+                {
+                    id: "telegram_join_1",
+                    platform: "telegram",
+                    type: "join",
+                    title: "Join Telegram Group",
+                    description: "Join our official Telegram group",
+                    reward: "100",
+                    icon: "fab fa-telegram",
+                    color: "#0088cc"
+                }
+            ]
+        };
+
+        // Global variables
+        let web3;
+        let contract;
+        let userAddress;
+        let isRegistered = false;
+        let isActive = false;
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSocialTasks();
+            updateReferralTable();
+            checkWalletConnection();
+            
+            // Event Listeners
+            document.getElementById('connectWallet').addEventListener('click', showWalletModal);
+            document.getElementById('registerBtn').addEventListener('click', registerUser);
+            document.getElementById('activateBtn').addEventListener('click', activateUser);
+            document.getElementById('dailyClaimBtn').addEventListener('click', dailyClaim);
+            document.getElementById('withdrawBtn').addEventListener('click', withdrawTokens);
+            document.getElementById('submitProof').addEventListener('click', submitTaskProof);
+            
+            // Auto-load sample data (remove in production)
+            loadSampleData();
+        });
+
+        function loadSocialTasks() {
+            const container = document.getElementById('social-tasks-container');
+            container.innerHTML = '';
+            
+            CONFIG.socialTasks.forEach(task => {
+                const taskCard = `
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card card-custom task-card ${task.platform}">
+                            <div class="card-body-custom">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="platform-icon ${task.platform}-bg me-3">
+                                        <i class="${task.icon}"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-1">${task.title}</h5>
+                                        <small class="text-muted">${task.description}</small>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="badge bg-success">${task.reward} VNTT</span>
+                                        <span class="badge bg-secondary ms-2">${task.type}</span>
+                                    </div>
+                                    <button class="btn btn-sm btn-custom" onclick="openTaskModal('${task.id}')">
+                                        <i class="fas fa-check-circle me-1"></i> Complete
+                                    </button>
+                                </div>
+                                <div class="mt-3">
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>
+                                        Complete and submit proof for verification
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += taskCard;
+            });
+        }
+
+        function openTaskModal(taskId) {
+            const task = CONFIG.socialTasks.find(t => t.id === taskId);
+            if (!task) return;
+            
+            document.getElementById('taskDetails').innerHTML = `
+                <div class="text-center mb-3">
+                    <div class="platform-icon ${task.platform}-bg d-inline-flex mb-3" 
+                         style="width: 60px; height: 60px;">
+                        <i class="${task.icon} fa-2x"></i>
+                    </div>
+                    <h4>${task.title}</h4>
+                    <p>${task.description}</p>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Reward: <strong>${task.reward} VNTT Tokens</strong>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('proofInput').value = '';
+            document.getElementById('proofFile').value = '';
+            document.getElementById('submitProof').dataset.taskId = taskId;
+            
+            const modal = new bootstrap.Modal(document.getElementById('taskModal'));
+            modal.show();
+        }
+
+        function submitTaskProof() {
+            const taskId = document.getElementById('submitProof').dataset.taskId;
+            const proofInput = document.getElementById('proofInput').value;
+            const proofFile = document.getElementById('proofFile').files[0];
+            
+            if (!proofInput && !proofFile) {
+                alert('Please provide proof link or upload screenshot');
+                return;
+            }
+            
+            // Here you would normally send to your backend for verification
+            // For now, we'll simulate success
+            alert('Task proof submitted! Admin will verify within 24 hours.');
+            
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('taskModal'));
+            modal.hide();
+            
+            // Update UI
+            const btn = event.target;
+            btn.innerHTML = '<i class="fas fa-check me-1"></i> Submitted';
+            btn.classList.remove('btn-custom');
+            btn.classList.add('btn-success');
+            btn.disabled = true;
+        }
+
+        function updateReferralTable() {
+            const table = document.getElementById('referralTable');
+            table.innerHTML = '';
+            
+            const rewards = [100, 80, 60, 40, 20, 10, 10, 10, 10, 10];
+            
+            rewards.forEach((reward, index) => {
+                const row = `
+                    <tr>
+                        <td>Level ${index + 1}</td>
+                        <td>${reward} VNTT</td>
+                        <td>0 VNTT</td>
+                    </tr>
+                `;
+                table.innerHTML += row;
+            });
+        }
+
+        async function connectMetaMask() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                    userAddress = accounts[0];
+                    
+                    // Update UI
+                    document.getElementById('walletAddress').textContent = 
+                        userAddress.substring(0, 6) + '...' + userAddress.substring(38);
+                    document.getElementById('connectWallet').textContent = 'Connected';
+                    document.getElementById('connectWallet').classList.remove('btn-light');
+                    document.getElementById('connectWallet').classList.add('btn-success');
+                    
+                    // Enable buttons
+                    document.getElementById('activateBtn').disabled = false;
+                    document.getElementById('dailyClaimBtn').disabled = false;
+                    document.getElementById('withdrawBtn').disabled = false;
+                    
+                    // Close modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('walletModal'));
+                    modal.hide();
+                    
+                    // Load user data
+                    loadUserData();
+                    
+                } catch (error) {
+                    console.error("Error connecting:", error);
+                    alert("Error connecting to MetaMask");
+                }
+            } else {
+                alert("Please install MetaMask!");
+            }
+        }
+
+        function showWalletModal() {
+            const modal = new bootstrap.Modal(document.getElementById('walletModal'));
+            modal.show();
+        }
+
+        function copyReferralLink() {
+            const link = `https://vntt.network/ref/${userAddress || 'your-address'}`;
+            navigator.clipboard.writeText(link).then(() => {
+                alert('Referral link copied to clipboard!');
+            });
+        }
+
+        function registerUser() {
+            if (!userAddress) {
+                alert('Please connect wallet first');
+                return;
+            }
+            
+            // Simulate registration
+            alert('Registration successful! Please activate your account.');
+            isRegistered = true;
+            document.getElementById('registerBtn').innerHTML = '<i class="fas fa-check me-2"></i> Registered';
+            document.getElementById('registerBtn').classList.remove('btn-custom');
+            document.getElementById('registerBtn').classList.add('btn-success');
+            document.getElementById('registerBtn').disabled = true;
+        }
+
+        function activateUser() {
+            if (!userAddress) {
+                alert('Please connect wallet first');
+                return;
+            }
+            
+            const confirmation = confirm(`Activate your account for ${CONFIG.activationFee} BUSD?`);
+            if (confirmation) {
+                // Simulate activation
+                alert('Account activated successfully! You can now claim daily rewards.');
+                isActive = true;
+                document.getElementById('activateBtn').innerHTML = '<i class="fas fa-check me-2"></i> Activated';
+                document.getElementById('activateBtn').classList.remove('btn-custom');
+                document.getElementById('activateBtn').classList.add('btn-success');
+                document.getElementById('activateBtn').disabled = true;
+                
+                // Update stats
+                document.getElementById('totalEarned').textContent = '100';
+                document.getElementById('lockedTokens').textContent = '100';
+            }
+        }
+
+        function dailyClaim() {
+            if (!isActive) {
+                alert('Please activate your account first');
+                return;
+            }
+            
+            alert('Daily claim successful! 100 VNTT added to your account.');
+            document.getElementById('dailyClaimBtn').innerHTML = '<i class="fas fa-check me-2"></i> Claimed Today';
+            document.getElementById('dailyClaimBtn').disabled = true;
+            document.getElementById('dailyClaimBtn').classList.remove('btn-custom');
+            document.getElementById('dailyClaimBtn').classList.add('btn-secondary');
+            
+            // Update stats
+            const currentEarned = parseInt(document.getElementById('totalEarned').textContent);
+            const currentLocked = parseInt(document.getElementById('lockedTokens').textContent);
+            document.getElementById('totalEarned').textContent = (currentEarned + 100).toString();
+            document.getElementById('lockedTokens').textContent = (currentLocked + 100).toString();
+        }
+
+        function withdrawTokens() {
+            const amount = document.getElementById('withdrawAmount').value;
+            const paymentMethod = document.getElementById('feePayment').value;
+            
+            if (!amount || amount <= 0) {
+                alert('Please enter valid amount');
+                return;
+            }
+            
+            const confirmation = confirm(`Withdraw ${amount} VNTT? Fee will be paid with ${paymentMethod.toUpperCase()}`);
+            if (confirmation) {
+                // Simulate withdrawal
+                alert('Withdrawal request submitted! Tokens will be sent after processing.');
+                
+                // Update stats
+                const currentLocked = parseInt(document.getElementById('lockedTokens').textContent);
+                const newLocked = Math.max(0, currentLocked - amount);
+                document.getElementById('lockedTokens').textContent = newLocked.toString();
+                document.getElementById('withdrawAmount').value = '0';
+            }
+        }
+
+        function checkWalletConnection() {
+            // Check if wallet is already connected
+            if (typeof window.ethereum !== 'undefined' && window.ethereum.selectedAddress) {
+                userAddress = window.ethereum.selectedAddress;
+                document.getElementById('walletAddress').textContent = 
+                    userAddress.substring(0, 6) + '...' + userAddress.substring(38);
+                document.getElementById('connectWallet').textContent = 'Connected';
+                document.getElementById('connectWallet').classList.add('btn-success');
+                loadUserData();
+            }
+        }
+
+        function loadUserData() {
+            // In production, load real data from contract
+            // For demo, we load sample data
+            loadSampleData();
+        }
+
+        function loadSampleData() {
+            // Sample data for demo
+            document.getElementById('totalEarned').textContent = '850';
+            document.getElementById('lockedTokens').textContent = '650';
+            document.getElementById('directRefs').textContent = '3';
+            document.getElementById('refEarnings').textContent = '240';
+            document.getElementById('availableWithdraw').value = '250';
+            document.getElementById('daysRemaining').textContent = '59 days';
+            
+            // Set referral link
+            if (userAddress) {
+                document.getElementById('referralLink').value = 
+                    `https://vntt.network/ref/${userAddress}`;
+                document.getElementById('uplineAddress').value = 
+                    '0x742d35Cc6634C0532925a3b844Bc454e4438f44e'; // Sample upline
+            }
+        }
+    </script>
+</body>
+</html>
