@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VNTT Network - Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: #f5f5f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .sidebar {
+            background: #2c3e50;
+            color: white;
+            min-height: 100vh;
+            padding-top: 20px;
+        }
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            border-radius: 5px;
+            margin: 5px 10px;
+            transition: all 0.3s;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+        .stat-box {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            margin-bottom: 20px;
+        }
+        .stat-box.pending { background: #ffc107; }
+        .stat-box.verified { background: #28a745; }
+        .stat-box.rejected { background: #dc3545; }
+        .stat-box.total { background: #007bff; }
+        .proof-image {
+            max-width: 200px;
+            max-height: 200px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .modal-image {
+            max-width: 100%;
+            max-height: 80vh;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar">
+                <div class="text-center mb-4">
+                    <h4><i class="fas fa-user-shield"></i> Admin Panel</h4>
+                    <small>VNTT Network</small>
+                </div>
+                
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" onclick="showSection('dashboard')">
+                            <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showSection('pending-proofs')">
+                            <i class="fas fa-clock me-2"></i> Pending Proofs
+                            <span id="pendingCount" class="badge bg-warning float-end">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showSection('all-proofs')">
+                            <i class="fas fa-list me-2"></i> All Proofs
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showSection('tasks')">
+                            <i class="fas fa-tasks me-2"></i> Manage Tasks
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showSection('settings')">
+                            <i class="fas fa-cog me-2"></i> Settings
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="mt-auto p-3">
+                    <div class="card bg-dark text-white">
+                        <div class="card-body">
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="adminToken" 
+                                       placeholder="Enter Admin Token" value="admin123">
+                                <button class="btn btn-primary" onclick="loginAdmin()">
+                                    <i class="fas fa-sign-in-alt"></i>
+                                </button>
+                            </div>
+                            <div id="loginStatus" class="mt-2 small text-success">
+                                <i class="fas fa-check-circle"></i> Use token: admin123
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 p-4">
+                <!-- Dashboard Section -->
+                <div id="dashboard-section">
+                    <h2 class="mb-4">Dashboard Overview</h2>
+                    
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="stat-box total">
+                                <h3 id="totalProofs">0</h3>
+                                <p>Total Proofs</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-box pending">
+                                <h3 id="pendingProofs">0</h3>
+                                <p>Pending</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-box verified">
+                                <h3 id="verifiedProofs">0</h3>
+                                <p>Verified</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-box rejected">
+                                <h3 id="rejectedProofs">0</h3>
+                                <p>Rejected</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0">Quick Actions</h5>
+                                </div>
+                                <div class="card-body">
+                                    <button class="btn btn-primary w-100 mb-2" onclick="showSection('pending-proofs')">
+                                        <i class="fas fa-check-circle me-2"></i> Verify Pending Proofs
+                                    </button>
+                                    <button class="btn btn-info w-100" onclick="refreshStats()">
+                                        <i class="fas fa-sync-alt me-2"></i> Refresh Data
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0">Admin Instructions</h5>
+                                </div>
+                                <div class="card-body">
+                                    <ol class="small">
+                                        <li>Login with token: <strong>admin123</strong></li>
+                                        <li>Check "Pending Proofs" section</li>
+                                        <li>Verify or Reject each proof</li>
+                                        <li>User will get reward automatically</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pending Proofs Section -->
+                <div id="pending-proofs-section" style="display: none;">
+                    <h2 class="mb-4">Pending Proofs Verification</h2>
+                    <div id="pendingProofsList">
+                        <p class="text-muted">Please login first</p>
+                    </div>
+                </div>
+                
+                <!-- All Proofs Section -->
+                <div id="all-proofs-section" style="display: none;">
+                    <h2 class="mb-4">All Proofs</h2>
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="searchProofs" 
+                               placeholder="Search by user address..." 
+                               onkeyup="filterProofs()">
+                    </div>
+                    <div id="allProofsList">
+                        <p class="text-muted">Please login first</p>
+                    </div>
+                </div>
+                
+                <!-- Tasks Section -->
+                <div id="tasks-section" style="display: none;">
+                    <h2 class="mb-4">Manage Tasks</h2>
+                    <div id="tasksList">
+                        <p class="text-muted">Loading tasks...</p>
+                    </div>
+                </div>
+                
+                <!-- Settings Section -->
+                <div id="settings-section" style="display: none;">
+                    <h2 class="mb-4">Settings</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5>Admin Configuration</h5>
+                            <div class="mb-3">
+                                <label class="form-label">Current Admin Token</label>
+                                <input type="text" class="form-control" value="admin123" readonly>
+                                <small class="text-muted">Change this in api.php file</small>
+                            </div>
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                To change admin password, edit <strong>api.php</strong> file
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Image Preview Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Proof Screenshot</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="modalImage" src="" class="modal-image" alt="Proof Image">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let adminToken = 'admin123';
+        let isLoggedIn = false;
+        
+        // Auto login with default token
+        loginAdmin();
+        
+        function showSection(sectionId) {
+            // Hide all sections
+            document.getElementById('dashboard-section').style.display = 'none';
+            document.getElementById('pending-proofs-section').style.display = 'none';
+            document.getElementById('all-proofs-section').style.display = 'none';
+            document.getElementById('tasks-section').style.display = 'none';
+            document.getElementById('settings-section').style.display = 'none';
+            
+            // Show selected section
+            document.getElementById(sectionId + '-section').style.display = 'block';
+            
+            // Load section data if logged in
+            if (isLoggedIn) {
+                switch(sectionId) {
+                    case 'dashboard':
+                        loadDashboard();
+                        break;
+                    case 'pending-proofs':
+                        loadPendingProofs();
+                        break;
+                    case 'all-proofs':
+                        loadAllProofs();
+                        break;
+                    case 'tasks':
+                        loadTasks();
+                        break;
+                }
+            }
+        }
+        
+        function loginAdmin() {
+            const token = document.getElementById('adminToken').value.trim();
+            if (!token) {
+                alert('Please enter admin token');
+                return;
+            }
+            
+            adminToken = token;
+            isLoggedIn = true;
+            
+            document.getElementById('loginStatus').innerHTML = 
+                '<span class="text-success"><i class="fas fa-check-circle"></i> Logged in</span>';
+            
+            // Load dashboard
+            showSection('dashboard');
+        }
+        
+        async function loadDashboard() {
+            try {
+                const response = await fetch('api.php?action=stats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('totalProofs').textContent = data.stats.totalProofs;
+                    document.getElementById('pendingProofs').textContent = data.stats.pendingProofs;
+                    document.getElementById('verifiedProofs').textContent = data.stats.verifiedProofs;
+                    document.getElementById('rejectedProofs').textContent = data.stats.rejectedProofs;
+                    
+                    // Update pending count in sidebar
+                    document.getElementById('pendingCount').textContent = data.stats.pendingProofs;
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+        
+        async function loadPendingProofs() {
+            try {
+                const response = await fetch('api.php?action=pending-proofs');
+                const data = await response.json();
+                const container = document.getElementById('pendingProofsList');
+                
+                if (data.success && data.proofs && data.proofs.length > 0) {
+                    let html = '';
+                    
+                    data.proofs.forEach(proof => {
+                        html += `
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <h5>${proof.title || proof.task_id}</h5>
+                                            <p><strong>User:</strong> ${proof.user_name} (${proof.user_address})</p>
+                                            <p><strong>Submitted:</strong> ${proof.submitted_at}</p>
+                                            ${proof.proof_url ? 
+                                                `<p><strong>Proof URL:</strong> <a href="${proof.proof_url}" target="_blank">${proof.proof_url}</a></p>` : 
+                                                ''
+                                            }
+                                            ${proof.screenshot_path ? 
+                                                `<p>
+                                                    <strong>Screenshot:</strong><br>
+                                                    <a href="${proof.screenshot_path}" target="_blank">View Image</a>
+                                                </p>` : 
+                                                ''
+                                            }
+                                        </div>
+                                        <div class="col-md-4 text-end">
+                                            <div class="btn-group-vertical">
+                                                <button class="btn btn-success mb-2" 
+                                                        onclick="verifyProof('${proof.id}', 'verified')">
+                                                    <i class="fas fa-check me-1"></i> Verify
+                                                </button>
+                                                <button class="btn btn-danger" 
+                                                        onclick="verifyProof('${proof.id}', 'rejected')">
+                                                    <i class="fas fa-times me-1"></i> Reject
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = '<p class="text-muted">No pending proofs found</p>';
+                }
+            } catch (error) {
+                console.error('Error loading pending proofs:', error);
+                document.getElementById('pendingProofsList').innerHTML = 
+                    '<p class="text-danger">Error loading proofs</p>';
+            }
+        }
+        
+        async function verifyProof(proofId, status) {
+            if (!isLoggedIn) {
+                alert('Please login first');
+                return;
+            }
+            
+            const comments = prompt(`Enter comments for ${status}:`, '');
+            
+            try {
+                const response = await fetch('api.php?action=verify-proof', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        proofId: proofId,
+                        status: status,
+                        comments: comments
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(`Proof ${status} successfully`);
+                    loadPendingProofs();
+                    loadDashboard();
+                } else {
+                    alert('Failed to verify proof');
+                }
+            } catch (error) {
+                console.error('Error verifying proof:', error);
+                alert('Error verifying proof');
+            }
+        }
+        
+        async function loadAllProofs() {
+            try {
+                const response = await fetch('api.php?action=all-proofs');
+                const data = await response.json();
+                const container = document.getElementById('allProofsList');
+                
+                if (data.success && data.proofs) {
+                    let html = '<div class="table-responsive"><table class="table table-striped"><thead><tr><th>ID</th><th>User</th><th>Task</th><th>Status</th><th>Submitted</th><th>Actions</th></tr></thead><tbody>';
+                    
+                    data.proofs.forEach(proof => {
+                        html += `
+                            <tr>
+                                <td>${proof.id}</td>
+                                <td>${proof.user_address.substring(0, 10)}...</td>
+                                <td>${proof.task_id}</td>
+                                <td><span class="badge bg-${proof.status === 'verified' ? 'success' : proof.status === 'rejected' ? 'danger' : 'warning'}">${proof.status}</span></td>
+                                <td>${proof.submitted_at}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-info" onclick="viewProof(${proof.id})">View</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    
+                    html += '</tbody></table></div>';
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = '<p class="text-muted">No proofs found</p>';
+                }
+            } catch (error) {
+                console.error('Error loading all proofs:', error);
+            }
+        }
+        
+        async function loadTasks() {
+            try {
+                const response = await fetch('api.php?action=tasks');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const container = document.getElementById('tasksList');
+                    let html = '<div class="row">';
+                    
+                    data.tasks.forEach(task => {
+                        html += `
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5>${task.title}</h5>
+                                        <p class="text-muted">${task.description}</p>
+                                        <div class="d-flex justify-content-between">
+                                            <span class="badge bg-primary">${task.platform}</span>
+                                            <span class="badge bg-success">${task.reward} VNTT</span>
+                                            <span class="badge ${task.is_active ? 'bg-success' : 'bg-secondary'}">
+                                                ${task.is_active ? 'Active' : 'Inactive'}
+                                            </span>
+                                        </div>
+                                        <small class="text-muted d-block mt-2">ID: ${task.id}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += '</div>';
+                    container.innerHTML = html;
+                }
+            } catch (error) {
+                console.error('Error loading tasks:', error);
+            }
+        }
+        
+        function refreshStats() {
+            loadDashboard();
+        }
+        
+        // Initialize
+        showSection('dashboard');
+    </script>
+</body>
+</html>
